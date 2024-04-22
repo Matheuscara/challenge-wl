@@ -1,7 +1,9 @@
 package comspringboot.challengewl.controllers;
 
-import comspringboot.challengewl.dtos.UserRequestDto;
-import comspringboot.challengewl.errors.UserErrorResponse;
+import comspringboot.challengewl.controllers.dtos.UserRequestDTO;
+import comspringboot.challengewl.controllers.dtos.UserResponseDTO;
+import comspringboot.challengewl.controllers.mapper.UserMapper;
+import comspringboot.challengewl.exceptions.errors.UserErrorResponse;
 import comspringboot.challengewl.exceptions.UserConflictException;
 import comspringboot.challengewl.exceptions.UserNotFoundException;
 import comspringboot.challengewl.models.UserModel;
@@ -12,33 +14,31 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController()
-@RequestMapping("/user")
+@RequestMapping("v1/user")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private final UserMapper userMapper;
 
     @Operation(
             method = "Post",
             description = "Create user in database",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
-                    content = @Content(schema = @Schema(implementation = UserRequestDto.class))
+                    content = @Content(schema = @Schema(implementation = UserRequestDTO.class))
             ),
             responses = @ApiResponse(
                     description = "Return object of user, with relation in links",
@@ -51,23 +51,11 @@ public class UserController {
                     )
             )
     )
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("")
-    public UserModel SaveUser(@RequestBody @Valid UserRequestDto userRequestBody) {
-        // Search user in database by id, and return optional value
-        Optional<UserModel> userExist = userService.findByEmail(userRequestBody.email());
-        // If user existed, return error
-        if (userExist.isPresent()) {
-            throw new UserConflictException("Email existed - " + userRequestBody.email());
-        }
-        // Create UserModel
-        UserModel userCreated = new UserModel();
-        // Copy properties in Body to UserModel created
-        BeanUtils.copyProperties(userRequestBody, userCreated);
-        // Save model in database
-        userService.createUser(userCreated);
-        // Reference a link to user details
-        return userCreated.add(linkTo(methodOn(UserController.class).FindUserByID(userCreated.getId())).withRel("Detalhes"));
+    @ResponseStatus(CREATED)
+    @PostMapping
+    public UserResponseDTO save(@RequestBody @Valid UserRequestDTO request) {
+        final UserModel user = userService.createUser(userMapper.toModel(request));
+        return userMapper.toDTO(user);
     }
 
     @Operation(
@@ -81,14 +69,13 @@ public class UserController {
                     content = @Content(schema = @Schema(implementation = UserModel.class))
             )
     )
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<Object> FindUserByID(@PathVariable(value = "id") int id) {
-        // Search user in database by id, and return optional value
         Optional<UserModel> userSearch = userService.findById(id);
         // Verify user find
         if(userSearch.isPresent()) {
             // Return user and OK status
-            return ResponseEntity.status(HttpStatus.OK).body(userSearch.get());
+            return ResponseEntity.status(OK).body(userSearch.get());
         }
         // Return bad request and NOT FOUND status
         throw new UserNotFoundException("User id not found - " + id);
@@ -99,7 +86,7 @@ public class UserController {
             description = "Change parameters user in database",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
-                    content = @Content(schema = @Schema(implementation = UserRequestDto.class))
+                    content = @Content(schema = @Schema(implementation = UserRequestDTO.class))
             ),
             responses = @ApiResponse(
                     description = "Return object of user",
@@ -107,7 +94,7 @@ public class UserController {
             )
     )
     @PutMapping("/{id}")
-    public ResponseEntity<Object> UpdateUser(@RequestBody @Valid UserRequestDto userRequestBody, @PathVariable(value = "id") int id) {
+    public ResponseEntity<Object> UpdateUser(@RequestBody @Valid UserRequestDTO userRequestBody, @PathVariable(value = "id") int id) {
         // Search user in database by id, and return optional value
         Optional<UserModel> userSearch = userService.findById(id);
         // Verify user if exist
@@ -119,7 +106,7 @@ public class UserController {
             // Update User
             userService.updateUser(userUpdate);
             // Return http response to client
-            return ResponseEntity.status(HttpStatus.OK).body("User with id: " + userSearch.get().getId() + " updated");
+            return ResponseEntity.status(OK).body("User with id: " + userSearch.get().getId() + " updated");
         }
         // If user not exist, return http error response
         throw new UserNotFoundException("User id not found - " + id);
@@ -143,7 +130,7 @@ public class UserController {
             // delete User in dataBase
             userService.removeUser(user);
             // Return response http to client
-            return ResponseEntity.status(HttpStatus.OK).body("User with id: " + userSearch.get().getId() + " deleted");
+            return ResponseEntity.status(OK).body("User with id: " + userSearch.get().getId() + " deleted");
         }
         // If user not exist, return http error response
         throw new UserNotFoundException("User id not found - " + id);
@@ -156,11 +143,11 @@ public class UserController {
         // Create a UserErrorResponse
         UserErrorResponse errorResponse = new UserErrorResponse();
         // Set UserErrorResponse
-        errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
+        errorResponse.setStatus(NOT_FOUND.value());
         errorResponse.setMessage(exc.getMessage());
         errorResponse.setTimeStamp(System.currentTimeMillis());
         // return ResponseEntity
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorResponse, NOT_FOUND);
     }
 
     // Add an exception handler using @ExceptionHandler
@@ -169,11 +156,11 @@ public class UserController {
         // Create a UserErrorResponse
         UserErrorResponse errorResponse = new UserErrorResponse();
         // Set UserErrorResponse
-        errorResponse.setStatus(HttpStatus.CONFLICT.value());
+        errorResponse.setStatus(CONFLICT.value());
         errorResponse.setMessage(exc.getMessage());
         errorResponse.setTimeStamp(System.currentTimeMillis());
         // return ResponseEntity
-        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(errorResponse, CONFLICT);
     }
 
     // Ass another exception handler ... to catch any exception
@@ -182,15 +169,10 @@ public class UserController {
         // Create a UserErrorResponse
         UserErrorResponse errorResponse = new UserErrorResponse();
         // Set UserErrorResponse
-        errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorResponse.setStatus(BAD_REQUEST.value());
         errorResponse.setMessage(exc.getMessage());
         errorResponse.setTimeStamp(System.currentTimeMillis());
         // return ResponseEntity
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorResponse, BAD_REQUEST);
     }
 }
-
-
-
-
-

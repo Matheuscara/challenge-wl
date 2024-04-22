@@ -1,43 +1,41 @@
 package comspringboot.challengewl.services;
 
+import comspringboot.challengewl.exceptions.UserConflictException;
+import comspringboot.challengewl.exceptions.UserNotFoundException;
 import comspringboot.challengewl.models.UserModel;
 import comspringboot.challengewl.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
 
-    @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    };
-
     @Transactional
     public UserModel createUser(UserModel user) {
+        if (findByEmail(user.getEmail()) != null) {
+            throw new UserConflictException("user conflict exception");
+        }
         return userRepository.save(user);
-    };
+    }
 
-    public Optional<UserModel> findById(int id) {
-        return userRepository.findById(id);
-    };
+    public UserModel findById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("user not found!"));
+    }
 
-    @Transactional
-    public void updateUser(UserModel user) {
-        userRepository.updateUser(user.getEmail(), user.getFirstName(), user.getLastName(), user.getId());
-    };
+//    @Transactional
+//    public void updateUser(UserModel user) {
+//        userRepository.updateUser(user.getEmail(), user.getFirstName(), user.getLastName(), user.getId());
+//    }
 
-    @Transactional
-    public void removeUser(UserModel user) {
-        userRepository.delete(user);
-    };
+    public void removeUser(Long id) {
+        userRepository.deleteById(id);
+    }
 
-    public Optional<UserModel> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    };
+    public UserModel findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException("user not found!"));
+    }
 }

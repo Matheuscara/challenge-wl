@@ -1,6 +1,9 @@
 package comspringboot.challengewl.controllers;
 
 import comspringboot.challengewl.dtos.UserRequestDto;
+import comspringboot.challengewl.errors.UserErrorResponse;
+import comspringboot.challengewl.exceptions.UserConflictException;
+import comspringboot.challengewl.exceptions.UserNotFoundException;
 import comspringboot.challengewl.models.UserModel;
 import comspringboot.challengewl.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,7 +58,7 @@ public class UserController {
         Optional<UserModel> userExist = userService.findByEmail(userRequestBody.email());
         // If user existed, return error
         if (userExist.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, userRequestBody.email());
+            throw new UserConflictException("Email existed - " + userRequestBody.email());
         }
         // Create UserModel
         UserModel userCreated = new UserModel();
@@ -88,7 +91,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(userSearch.get());
         }
         // Return bad request and NOT FOUND status
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        throw new UserNotFoundException("User id not found - " + id);
     }
 
     @Operation(
@@ -119,7 +122,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body("User with id: " + userSearch.get().getId() + " updated");
         }
         // If user not exist, return http error response
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        throw new UserNotFoundException("User id not found - " + id);
     }
 
     @Operation(
@@ -143,6 +146,51 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body("User with id: " + userSearch.get().getId() + " deleted");
         }
         // If user not exist, return http error response
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        throw new UserNotFoundException("User id not found - " + id);
+    }
+
+
+    // Add an exception handler using @ExceptionHandler
+    @ExceptionHandler
+    public ResponseEntity<UserErrorResponse> handleException(UserNotFoundException exc) {
+        // Create a UserErrorResponse
+        UserErrorResponse errorResponse = new UserErrorResponse();
+        // Set UserErrorResponse
+        errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
+        errorResponse.setMessage(exc.getMessage());
+        errorResponse.setTimeStamp(System.currentTimeMillis());
+        // return ResponseEntity
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    // Add an exception handler using @ExceptionHandler
+    @ExceptionHandler
+    public ResponseEntity<UserErrorResponse> handleException(UserConflictException exc) {
+        // Create a UserErrorResponse
+        UserErrorResponse errorResponse = new UserErrorResponse();
+        // Set UserErrorResponse
+        errorResponse.setStatus(HttpStatus.CONFLICT.value());
+        errorResponse.setMessage(exc.getMessage());
+        errorResponse.setTimeStamp(System.currentTimeMillis());
+        // return ResponseEntity
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    // Ass another exception handler ... to catch any exception
+    @ExceptionHandler
+    public ResponseEntity<UserErrorResponse> handleException(Exception exc) {
+        // Create a UserErrorResponse
+        UserErrorResponse errorResponse = new UserErrorResponse();
+        // Set UserErrorResponse
+        errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorResponse.setMessage(exc.getMessage());
+        errorResponse.setTimeStamp(System.currentTimeMillis());
+        // return ResponseEntity
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }
+
+
+
+
+

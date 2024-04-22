@@ -1,12 +1,7 @@
-FROM ubuntu:latest
-LABEL authors="dias"
+FROM openjdk:17
 
-ENTRYPOINT ["top", "-b"]
+ARG JAR_FILE=target/*.jar
 
-FROM openjdk:11-jdk
+COPY ./target/challenge-wl-0.0.1-SNAPSHOT.jar app.jar
 
-WORKDIR /app
-
-COPY target/challenge-wl.jar /app/challenge-wl.jar
-
-CMD ["java", "-jar", "challenge-wl.jar"]
+ENTRYPOINT ["java", "-jar", "/app.jar"]

@@ -3,7 +3,7 @@ package comspringboot.challengewl.dtos;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record PeopleRequestDto(
+public record UserRequestDto(
         @NotBlank @NotNull
         String firstName,
         @NotBlank @NotNull

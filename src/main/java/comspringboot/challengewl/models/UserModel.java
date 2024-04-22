@@ -5,8 +5,9 @@ import org.springframework.hateoas.RepresentationModel;
 
 import java.io.Serializable;
 
-@Entity(name = "people")
-public class PeopleModel extends RepresentationModel<PeopleModel> implements Serializable
+@Entity()
+@Table(name = "user_jpa")
+public class UserModel extends RepresentationModel<UserModel> implements Serializable
 {
 
     @Id
@@ -20,12 +21,12 @@ public class PeopleModel extends RepresentationModel<PeopleModel> implements Ser
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "email")
+    @Column(unique = true, name = "email")
     private String email;
 
-    public PeopleModel() {}
+    public UserModel() {}
 
-    public PeopleModel(String firstName, String lastName, String email) {
+    public UserModel(String firstName, String lastName, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -66,7 +67,7 @@ public class PeopleModel extends RepresentationModel<PeopleModel> implements Ser
     // Quest: what to do it?
     @Override
     public String toString() {
-        return "People{" +
+        return "User{" +
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +

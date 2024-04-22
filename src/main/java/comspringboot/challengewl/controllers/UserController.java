@@ -3,7 +3,7 @@ package comspringboot.challengewl.controllers;
 import comspringboot.challengewl.controllers.dtos.UserRequestDTO;
 import comspringboot.challengewl.controllers.dtos.UserResponseDTO;
 import comspringboot.challengewl.controllers.mapper.UserMapper;
-import comspringboot.challengewl.exceptions.errors.UserErrorResponse;
+import comspringboot.challengewl.exceptions.handler.ExceptionFilters;
 import comspringboot.challengewl.exceptions.UserConflictException;
 import comspringboot.challengewl.exceptions.UserNotFoundException;
 import comspringboot.challengewl.models.UserModel;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.http.HttpStatus.*;
 
 @RestController()
@@ -139,9 +138,9 @@ public class UserController {
 
     // Add an exception handler using @ExceptionHandler
     @ExceptionHandler
-    public ResponseEntity<UserErrorResponse> handleException(UserNotFoundException exc) {
+    public ResponseEntity<ExceptionFilters> handleException(UserNotFoundException exc) {
         // Create a UserErrorResponse
-        UserErrorResponse errorResponse = new UserErrorResponse();
+        ExceptionFilters errorResponse = new ExceptionFilters();
         // Set UserErrorResponse
         errorResponse.setStatus(NOT_FOUND.value());
         errorResponse.setMessage(exc.getMessage());
@@ -152,9 +151,9 @@ public class UserController {
 
     // Add an exception handler using @ExceptionHandler
     @ExceptionHandler
-    public ResponseEntity<UserErrorResponse> handleException(UserConflictException exc) {
+    public ResponseEntity<ExceptionFilters> handleException(UserConflictException exc) {
         // Create a UserErrorResponse
-        UserErrorResponse errorResponse = new UserErrorResponse();
+        ExceptionFilters errorResponse = new ExceptionFilters();
         // Set UserErrorResponse
         errorResponse.setStatus(CONFLICT.value());
         errorResponse.setMessage(exc.getMessage());
@@ -165,9 +164,9 @@ public class UserController {
 
     // Ass another exception handler ... to catch any exception
     @ExceptionHandler
-    public ResponseEntity<UserErrorResponse> handleException(Exception exc) {
+    public ResponseEntity<ExceptionFilters> handleException(Exception exc) {
         // Create a UserErrorResponse
-        UserErrorResponse errorResponse = new UserErrorResponse();
+        ExceptionFilters errorResponse = new ExceptionFilters();
         // Set UserErrorResponse
         errorResponse.setStatus(BAD_REQUEST.value());
         errorResponse.setMessage(exc.getMessage());

@@ -13,10 +13,26 @@ public class UserMapper {
         userModel.setEmail(dto.email());
         userModel.setFirstName(dto.firstName());
         userModel.setLastName(dto.lastName());
+        userModel.setBirthDate(dto.birthDate());
+        userModel.setTypeUser(dto.typeUser());
+        userModel.setPassword(dto.password());
+        userModel.setCpf(dto.cpf());
+        userModel.setImage(dto.image());
+        userModel.setPhoneNumber(dto.phoneNumber());
         return userModel;
     }
 
     public UserResponseDTO toDTO(UserModel userModel) {
-        return new UserResponseDTO(userModel.getId(), userModel.getFirstName(), userModel.getLastName(), userModel.getEmail());
+        return new UserResponseDTO(
+                userModel.getId(),
+                userModel.getFirstName(),
+                userModel.getLastName(),
+                userModel.getEmail(),
+                userModel.getBirthDate(),
+                userModel.getTypeUser(),
+                userModel.getCpf(),
+                userModel.getImage(),
+                userModel.getPhoneNumber()
+        );
     }
 }

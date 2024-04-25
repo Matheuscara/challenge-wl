@@ -16,6 +16,10 @@ Este projeto é um desafio para implementar os melhores conceitos do framework S
 - **Metadados com Anotações:** Utilização de anotações para fornecer metadados adicionais sobre as classes e métodos.
 - **Services de Aplicação:** Camada de serviço que encapsula a lógica de negócios da aplicação.
 - **Testes Unitários:** Testes automatizados para garantir a qualidade e integridade do código.
+- **ExceptionHandler:** capacidade de lidar com exceções de maneira centralizada e consistente em toda a aplicação.
+- **Lombok:** biblioteca para Java que permite reduzir a quantidade de código boilerplate (código repetitivo e de baixo valor) em projetos Java.
+- **Mapper:** Usado para gerenciamento de objetos do dto, tanto para pojo <-> object/json
+
 ## 💻 Pré-requisitos
 
 Antes de começar, verifique se você atendeu aos seguintes requisitos:

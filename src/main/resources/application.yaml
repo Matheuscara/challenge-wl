@@ -1,0 +1,13 @@
+spring:
+    application:
+        name: challenge-wl
+    datasource:
+        url: jdbc:postgresql://localhost:5432/challenge-wl
+        username: postgres
+        password: 748596123
+    jpa:
+        generate-ddl: true
+        hibernate:
+            ddl-auto: create-drop
+server:
+    port: 1000

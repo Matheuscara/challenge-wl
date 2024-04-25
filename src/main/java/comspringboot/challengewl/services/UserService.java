@@ -1,43 +1,43 @@
 package comspringboot.challengewl.services;
 
+import comspringboot.challengewl.controllers.dtos.UserRequestDTO;
+import comspringboot.challengewl.exceptions.UserConflictException;
+import comspringboot.challengewl.exceptions.UserNotFoundException;
 import comspringboot.challengewl.models.UserModel;
 import comspringboot.challengewl.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
 
-    @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    };
-
     @Transactional
-    public UserModel createUser(UserModel user) {
+    public UserModel save(UserModel user) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+            throw new UserConflictException("User existed in database!");
+        }
         return userRepository.save(user);
-    };
+    }
 
-    public Optional<UserModel> findById(int id) {
-        return userRepository.findById(id);
-    };
-
-    @Transactional
-    public void updateUser(UserModel user) {
-        userRepository.updateUser(user.getEmail(), user.getFirstName(), user.getLastName(), user.getId());
-    };
+    public UserModel findById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found!"));
+    }
 
     @Transactional
-    public void removeUser(UserModel user) {
-        userRepository.delete(user);
-    };
+    public UserModel update(UserRequestDTO userProperty, Long id) {
+        final UserModel user = findById(id);
+        BeanUtils.copyProperties(userProperty, user);
+        userRepository.save(user);
+        return user;
+    }
 
-    public Optional<UserModel> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    };
+    public void remove(Long id) {
+        findById(id);
+        userRepository.deleteById(id);
+    }
 }

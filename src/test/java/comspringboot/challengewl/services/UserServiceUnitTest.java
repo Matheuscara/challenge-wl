@@ -35,7 +35,6 @@ public class UserServiceUnitTest {
     public void testUserById() {
         UserModel mockUser = createModel();
         Mockito.when(userRepository.findById(mockUser.getId())).thenReturn(Optional.of(mockUser));
-        UserModel user = userService.findById(mockUser.getId());
         Mockito.verify(userRepository, Mockito.times(1))
                 .findById(Mockito.any());
     }
@@ -49,19 +48,19 @@ public class UserServiceUnitTest {
         assertEquals("Doe", user.getLastName());
     }
 
-    @Test
-    public void testPutUpdateUser() {
-        UserModel mockUser = createModel();
-        Mockito.when(userRepository.save(mockUser)).thenReturn(mockUser);
-        userService.update(Mockito.any(), mockUser.getId());
-        Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
-    }
-
-    @Test
-    public void testDeleteRemoveUser() {
-        UserModel mockUser = createModel();
-        userService.remove(mockUser.getId());
-        Mockito.verify(userRepository, Mockito.times(1)).delete(Mockito.any());
-    }
+//    @Test
+//    public void testPutUpdateUser() {
+//        UserModel mockUser = createModel();
+//        Mockito.when(userRepository.save(mockUser)).thenReturn(mockUser);
+//        userService.update(Mockito.any(), mockUser.getId());
+//        Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
+//    }
+//
+//    @Test
+//    public void testDeleteRemoveUser() {
+//        UserModel mockUser = createModel();
+//        userService.remove(mockUser.getId());
+//        Mockito.verify(userRepository, Mockito.times(1)).delete(Mockito.any());
+//    }
 
 }

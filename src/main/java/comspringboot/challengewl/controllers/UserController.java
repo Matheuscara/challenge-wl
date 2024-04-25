@@ -14,7 +14,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.http.HttpStatus.*;
 
 @RestController()
@@ -53,9 +52,6 @@ public class UserController {
     @Operation(
             method = "Get",
             description = "Select user in database",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    required = false
-            ),
             responses = @ApiResponse(
                     description = "Return object of user",
                     content = @Content(schema = @Schema(implementation = UserModel.class))
@@ -88,10 +84,7 @@ public class UserController {
 
     @Operation(
             method = "Delete",
-            description = "Delete user in database",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    required = false
-            )
+            description = "Delete user in database"
     )
     @ResponseStatus(OK)
     @DeleteMapping("/{id}")

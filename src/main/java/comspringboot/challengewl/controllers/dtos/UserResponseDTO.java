@@ -10,8 +10,8 @@ public record UserResponseDTO(
         String lastName,
         String email,
         Date birthDate,
-        TypeUsers typeUser,
         String cpf,
         String image,
-        String phoneNumber
+        String phoneNumber,
+        TypeUsers role
 ) {}

@@ -2,6 +2,7 @@ package comspringboot.challengewl.controllers.mapper;
 
 import comspringboot.challengewl.controllers.dtos.UserRequestDTO;
 import comspringboot.challengewl.controllers.dtos.UserResponseDTO;
+import comspringboot.challengewl.enums.TypeUsers;
 import comspringboot.challengewl.models.UserModel;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +15,10 @@ public class UserMapper {
         userModel.setFirstName(dto.firstName());
         userModel.setLastName(dto.lastName());
         userModel.setBirthDate(dto.birthDate());
-        userModel.setTypeUser(dto.typeUser());
         userModel.setPassword(dto.password());
         userModel.setCpf(dto.cpf());
         userModel.setImage(dto.image());
+        userModel.setRole(TypeUsers.ADMIN);
         userModel.setPhoneNumber(dto.phoneNumber());
         return userModel;
     }
@@ -29,10 +30,10 @@ public class UserMapper {
                 userModel.getLastName(),
                 userModel.getEmail(),
                 userModel.getBirthDate(),
-                userModel.getTypeUser(),
                 userModel.getCpf(),
                 userModel.getImage(),
-                userModel.getPhoneNumber()
+                userModel.getPhoneNumber(),
+                userModel.getRole()
         );
     }
 }

@@ -1,6 +1,5 @@
 package comspringboot.challengewl.controllers.dtos;
 
-import comspringboot.challengewl.enums.TypeUsers;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -18,8 +17,6 @@ public record UserRequestDTO(
 
         @NotNull
         Date birthDate,
-
-        TypeUsers typeUser,
 
         @NotBlank
         String password,
